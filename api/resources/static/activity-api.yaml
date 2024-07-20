@@ -1,0 +1,113 @@
+openapi: 3.0.3
+info:
+  title: 'Activity dahsboard service'
+  description: 'Activity Api'
+  contact:
+    name: Test Service
+  version: 2.7.0
+paths:
+  '/relationships/{relationshipId}/activities':
+    get:
+      tags:
+        - relationship activities
+      summary: Get activities
+      operationId: getActivitiesByRelationship
+      parameters:
+        - name: relationshipId
+          in: path
+          description: Relationship Id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivitySummary'
+        '400':
+          description: 'Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: 'Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: 'Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 'Internal Server Error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    ActivitySummary:
+      type: object
+      description: 'This is Activity response'
+      nullable: false
+      properties:
+        relationshipId:
+          type: string
+          nullable: true
+        activities:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/Activity'
+    Activity:
+      type: object
+      description: 'Activity object for all transfer types'
+      properties:
+        activityId:
+          type: string
+          nullable: true
+        type:
+          type: string
+          nullable: false
+          enum: [ACH, CHECK, FIRM, INTERNAL, MOBILE_CHECK]
+          description: 'Discribe the type of transfer'
+        statuses:
+          type: object
+          nullable: false
+
+    ErrorResponse:
+      type: object
+      description: 'Error response'
+      properties:
+        errors:
+          type: array
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/Error'
+    Error:
+      type: object
+      description: 'Error object'
+      required:
+        - code
+        - description
+      properties:
+        code:
+          type: integer
+          description: 'Error code description'
+        description:
+          type: string
+          description: 'Description of a code'
+        fieldNames:
+          type: array
+          minItems: 0
+          items:
+            type: string
+            description: 'Name of a fields causing error'

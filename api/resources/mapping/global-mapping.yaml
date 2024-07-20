@@ -1,0 +1,14 @@
+openapi-processor-mapping: v3
+
+options:
+  package-name: com.bank.ActivityService
+  javadoc: true
+  format-code: false
+  bean-validation: "jakarta"
+
+map:
+  types:
+    - type: array => java.util.List
+    - type: "ActivitySummary @ lombok.Data"
+    - type: "ActivitySummary @ lombok.Builder"
+

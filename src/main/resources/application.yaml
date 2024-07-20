@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: ActivityService
+
+app:
+  api-resource:
+    api-location: api/resources/static/activity-api.yaml
