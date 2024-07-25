@@ -1,0 +1,229 @@
+openapi: 3.0.3
+info:
+  title: 'Activity dahsboard service'
+  description: 'Activity Api'
+  contact:
+    name: Test Service
+  version: 2.7.0
+paths:
+  '/relationships/{relationshipId}/activities':
+    get:
+      tags:
+        - relationship activities
+      summary: Get activities
+      operationId: getActivitiesByRelationship
+      parameters:
+        - name: relationshipId
+          in: path
+          description: Relationship Id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivitySummary'
+        '400':
+          description: 'Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: 'Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: 'Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 'Internal Server Error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    ActivitySummary:
+      type: object
+      description: 'This is Activity response'
+      nullable: false
+      properties:
+        error:
+          $ref: '#/components/schemas/PartialError'
+        relationshipId:
+          type: string
+          nullable: true
+        activities:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/Activity'
+    Activity:
+      type: object
+      description: 'Activity object for all transfer types'
+      properties:
+        activityId:
+          type: string
+          nullable: true
+        type:
+          type: string
+          nullable: false
+          enum: [OUTSIDE_BACK, CHECK, FIRM, INTERNAL, MOBILE_CHECK]
+          description: 'Discribe the type of transfer'
+        statuses:
+          $ref: '#/components/schemas/Status'
+        from:
+          $ref: '#/components/schemas/Account'
+        to:
+          $ref: '#/components/schemas/Account'
+        transactionAmount:
+          $ref: '#/components/schemas/TransactionAmount'
+        transactionDate:
+          $ref: '#/components/schemas/TransactionDate'
+
+    Account:
+      type: object
+      nullable: false
+      properties:
+        accountId:
+          type: string
+          nullable: false
+          description: 'Unique Account Id'
+        accountNumber:
+          type: string
+          nullable: true
+          description: 'Unique Account Number'
+        accountName:
+          type: string
+          nullable: true
+          description: 'Account holde name'
+        source:
+          type: string
+          enum: [ SBI_ACCOUNT, BANK_ACCOUNT, OUTSIDE_FIRM, CHECK ]
+          description: 'Descript the type of account'
+        accountType:
+          type: string
+          nullable: false
+          enum: [ CASH, LOAN, SECURITIES ]
+          description: 'Describ the type of account'
+        isAccountFullyLoaded:
+          type: boolean
+          nullable: false
+          default: true
+          description: 'Describs if account is fully loaded or not'
+
+    TransactionAmount:
+      type: object
+      nullable: false
+      description: 'Shows the diffrent type of amount included in trasaction'
+      properties:
+        netAmount:
+          type: number
+          format: double
+          nullable: true
+          description: 'Net transaction amount'
+        grossAmount:
+          type: number
+          format: double
+          nullable: true
+          description: 'Gross Amount'
+        fees:
+          type: number
+          format: double
+          nullable: true
+          description: 'Transaction fees'
+        tax:
+          $ref: '#/components/schemas/TaxWitholding'
+
+    TransactionDate:
+      type: object
+      description: 'Transaction Date'
+      nullable: false
+      properties:
+        date:
+          type: string
+          nullable: false
+          description: 'Transaction date'
+        description:
+          type: string
+          nullable: true
+          description: 'Date description'
+
+    TaxWitholding:
+      type: object
+      nullable: true
+      description: 'Show all applied tax'
+      properties:
+        centralTax:
+          type: number
+          format: double
+          nullable: true
+          description: 'cCentral Goverment tax'
+        stateTax:
+          type: number
+          format: double
+          nullable: true
+          description: 'State government tax'
+    Status:
+      type: object
+      nullable: false
+      properties:
+        code:
+          nullable: false
+          type: string
+          enum: [ COMPLETED, REJECTED, IN_PROGRESS, FAILED ]
+        description:
+          nullable: true
+          type: string
+    PartialError:
+      type: object
+      nullable: false
+      description: 'Shows the failed call and treire error response'
+      properties:
+        failedType:
+          type: string
+          nullable: true
+          description: 'Shows which stream has failed ie: BANK, CHECK'
+        description:
+          type: string
+          nullable: true
+          description: 'User understandable error message'
+    ErrorResponse:
+      type: object
+      description: 'Error response'
+      properties:
+        errors:
+          type: array
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/Error'
+    Error:
+      type: object
+      description: 'Error object'
+      required:
+        - code
+        - description
+      properties:
+        code:
+          type: integer
+          description: 'Error code description'
+        description:
+          type: string
+          description: 'Description of a code'
+        fieldNames:
+          type: array
+          minItems: 0
+          items:
+            type: string
+            description: 'Name of a fields causing error'

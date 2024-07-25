@@ -1,0 +1,32 @@
+openapi-processor-mapping: v3
+
+options:
+  package-name: com.bank.ActivityService
+  javadoc: true
+  format-code: false
+  bean-validation: "jakarta"
+
+map:
+  types:
+    - type: array => java.util.List
+    - type: "ActivitySummary @ lombok.Data"
+    - type: "ActivitySummary @ lombok.Builder"
+    - type: "Activity @ lombok.Data"
+    - type: "Activity @ lombok.Builder"
+    - type: "Account @ lombok.Data"
+    - type: "Account @ lombok.Builder"
+    - type: "Error @ lombok.Data"
+    - type: "Error @ lombok.Builder"
+    - type: "ErrorResponse @ lombok.Data"
+    - type: "ErrorResponse @ lombok.Builder"
+    - type: "PartialError @ lombok.Data"
+    - type: "PartialError @ lombok.Builder"
+    - type: "Status @ lombok.Data"
+    - type: "Status @ lombok.Builder"
+    - type: "TaxWitholding @ lombok.Data"
+    - type: "TaxWitholding @ lombok.Builder"
+    - type: "TransactionAmount @ lombok.Data"
+    - type: "TransactionAmount @ lombok.Builder"
+    - type: "TransactionDate @ lombok.Data"
+    - type: "TransactionDate @ lombok.Builder"
+
