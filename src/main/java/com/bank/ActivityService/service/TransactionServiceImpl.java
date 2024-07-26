@@ -1,7 +1,19 @@
 package com.bank.ActivityService.service;
 
-import com.bank.ActivityService.model.*;
-import com.bank.ActivityService.repo.BankRepo;
+import com.bank.ActivityService.service.model.TransactionMapper;
+import com.bank.ActivityService.service.model.Account;
+import com.bank.ActivityService.service.model.AccountAccountType;
+import com.bank.ActivityService.service.model.AccountSource;
+import com.bank.ActivityService.service.model.Activity;
+import com.bank.ActivityService.service.model.ActivitySummary;
+import com.bank.ActivityService.service.model.ActivityType;
+import com.bank.ActivityService.service.model.PartialError;
+import com.bank.ActivityService.service.model.Status;
+import com.bank.ActivityService.service.model.StatusCode;
+import com.bank.ActivityService.service.model.TaxWitholding;
+import com.bank.ActivityService.service.model.TransactionAmount;
+import com.bank.ActivityService.service.model.TransactionDate;
+import com.bank.ActivityService.repo.TransactionRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -11,7 +23,9 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
-  private final BankRepo bankRepo;
+  private final TransactionRepo transactionRepo;
+
+  private final TransactionMapper transactionMapper = TransactionMapper.INSTANCE;
 
   private static final String ACTIVITY_ID_1111 = "act-1111";
   private static final String ACTIVITY_ID_2222 = "act-2222";
@@ -27,18 +41,22 @@ public class TransactionServiceImpl implements TransactionService {
 
   @Override
   public String getStatus(Integer accountId) {
-    return bankRepo.getStatus(accountId);
+    return transactionRepo.getStatus(accountId);
   }
 
   @Override
-  public ActivitySummary getActivities(String relationshipId) {
+  public com.bank.ActivityService.model.ActivitySummary getActivities(String relationshipId) {
     return Optional.ofNullable(getActivityByRelationshipId(relationshipId))
-        .map(map -> map.get(relationshipId))
+        .map(map -> transactionMapper.map(map.get(relationshipId)))
         .orElse(
-            ActivitySummary.builder()
+            com.bank.ActivityService.model
+                .ActivitySummary
+                .builder()
                 .relationshipId(relationshipId)
                 .error(
-                    PartialError.builder()
+                    com.bank.ActivityService.model
+                        .PartialError
+                        .builder()
                         .failedType("FULL_FAILURE")
                         .description("All type of activities failed")
                         .build())

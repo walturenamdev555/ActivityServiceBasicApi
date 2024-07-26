@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'jacoco'
     id 'org.springframework.boot' version '3.1.0'
     id 'io.spring.dependency-management' version '1.1.5'
     id 'io.openapiprocessor.openapi-processor' version '2023.1'
@@ -38,6 +39,13 @@ dependencies {
     implementation 'io.swagger.core.v3:swagger-annotations-jakarta:2.2.9'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
+    // Mapper
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    // https://mvnrepository.com/artifact/org.mapstruct/mapstruct-processor
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+    implementation 'javax.xml.bind:jaxb-api:2.3.1'
+
 }
 
 /* API generation task. */
@@ -65,8 +73,21 @@ sourceSets {
     }
 }
 
-tasks.named('test') {
+test {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect({
+            fileTree(dir: it, excludes: ['com.bank.ActivityService.service.model.*'])
+        })))
+    }
+    reports {
+        xml.required = true
+    }
 }
 
 compileJava {
@@ -74,7 +95,7 @@ compileJava {
     dependsOn copyApiDefinition
 /*	dependsOn copyDockerfile
 	dependsOn copyDeployFiles*/
-	options.compilerArgs << '-parameters'
-	options.compilerArgs += ['-Amapstruct.unmappedTargetPolicy=IGNORE']
-	options.encoding = 'UTF-8'
+    options.compilerArgs << '-parameters'
+    options.compilerArgs += ['-Amapstruct.unmappedTargetPolicy=IGNORE']
+    options.encoding = 'UTF-8'
 }
